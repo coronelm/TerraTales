@@ -17,62 +17,81 @@ class ToolsPage extends StatelessWidget {
         backgroundColor: Color(0xFF757121),
       ),
       body: ListView(
+        padding: EdgeInsets.all(16),
         children: [
-          ListTile(
-            title: Text('Rake'),
-            trailing: DropdownButton<String>(
-              value: 'Good to Use',
-              items: <String>['Good to Use', 'For Repair', 'Needs Replacement']
-                  .map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {},
-            ),
+          ToolItem(
+            image: AssetImage('images/Rake.jpg'),
+            toolName: 'Rake',
           ),
-          ListTile(
-            title: Text('Shovel'),
-            trailing: DropdownButton<String>(
-              value: 'For Repair',
-              items: <String>['Good to Use', 'For Repair', 'Needs Replacement']
-                  .map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {},
-            ),
+          SizedBox(height: 16),
+          ToolItem(
+            image: AssetImage('images/Shovel.jpg'),
+            toolName: 'Shovel',
           ),
-          ListTile(
-            title: Text('Hedge Shear'),
-            trailing: DropdownButton<String>(
-              value: 'Needs Replacement',
-              items: <String>['Good to Use', 'For Repair', 'Needs Replacement']
-                  .map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {},
-            ),
+          SizedBox(height: 16),
+          ToolItem(
+            image: AssetImage('images/HedgeShear.jpg'),
+            toolName: 'Hedge Shear',
           ),
-          ListTile(
-            title: Text('Trowel'),
-            trailing: DropdownButton<String>(
-              value: 'Needs Replacement',
-              items: <String>['Good to Use', 'For Repair', 'Needs Replacement']
-                  .map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {},
-            ),
+          SizedBox(height: 16),
+          ToolItem(
+            image: AssetImage('images/Trowel.jpg'),
+            toolName: 'Trowel',
+          ),
+          SizedBox(height: 16),
+          ToolItem(
+            image: AssetImage('images/Axe.jpg'),
+            toolName: 'Axe',
+          ),
+          SizedBox(height: 16),
+          ToolItem(
+            image: AssetImage('images/Dibber.jpg'),
+            toolName: 'Dibber',
+          ),
+          SizedBox(height: 16),
+          ToolItem(
+            image: AssetImage('images/GardenFork.jpg'),
+            toolName: 'Garden Fork',
+          ),
+          SizedBox(height: 16),
+          ToolItem(
+            image: AssetImage('images/GardenGloves.jpg'),
+            toolName: 'Garden Gloves',
+          ),
+          SizedBox(height: 16),
+          ToolItem(
+            image: AssetImage('images/GardenHoe.jpg'),
+            toolName: 'Garden Hoe',
+          ),
+          SizedBox(height: 16),
+          ToolItem(
+            image: AssetImage('images/GardeningCan.jpg'),
+            toolName: 'Gardening Can',
+          ),
+          SizedBox(height: 16),
+          ToolItem(
+            image: AssetImage('images/Loppers.jpg'),
+            toolName: 'Loppers',
+          ),
+          SizedBox(height: 16),
+          ToolItem(
+            image: AssetImage('images/Mattock.jpg'),
+            toolName: 'Mattock',
+          ),
+          SizedBox(height: 16),
+          ToolItem(
+            image: AssetImage('images/Sickle.jpg'),
+            toolName: 'Sickle',
+          ),
+          SizedBox(height: 16),
+          ToolItem(
+            image: AssetImage('images/Weeder.jpg'),
+            toolName: 'Weeder',
+          ),
+          SizedBox(height: 16),
+          ToolItem(
+            image: AssetImage('images/WheelBarrow.jpg'),
+            toolName: 'Wheel Barrow',
           ),
         ],
       ),
@@ -122,6 +141,71 @@ class ToolsPage extends StatelessWidget {
               break;
           }
         },
+      ),
+    );
+  }
+}
+
+class ToolItem extends StatefulWidget {
+  final ImageProvider image;
+  final String toolName;
+
+  ToolItem({required this.image, required this.toolName});
+
+  @override
+  _ToolItemState createState() => _ToolItemState();
+}
+
+class _ToolItemState extends State<ToolItem> {
+  String _selectedValue = 'Good to Use';
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      color: Color(0xFFF7F4E9),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          children: [
+            Image(
+              image: widget.image,
+              width: 50,
+              height: 50,
+            ),
+            SizedBox(width: 20),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  widget.toolName,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 10),
+                DropdownButton<String>(
+                  value: _selectedValue,
+                  items: <String>['Good to Use', 'For Repair', 'Needs Replacement']
+                      .map((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      _selectedValue = newValue!;
+                    });
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
