@@ -30,25 +30,55 @@ class _BlankNotePageState extends State<BlankNotePage> {
     _contentController.text = widget.initialContent ?? '';
     _lastTitle = _titleController.text;
     _lastContent = _contentController.text;
+    _contentController.addListener(_handleTextChange);
   }
 
-  void _insertCheckbox() {
-    setState(() {
-      final newText = _contentController.text + '\n[ ] ';
-      _contentController.text = newText;
-    });
+  @override
+  void dispose() {
+    _contentController.removeListener(_handleTextChange);
+    _contentController.dispose();
+    super.dispose();
   }
 
-  void _toggleCheckbox(int index) {
-    setState(() {
-      List<String> lines = _contentController.text.split('\n');
-      if (lines[index].startsWith('[ ]')) {
-        lines[index] = lines[index].replaceFirst('[ ]', '[x]');
-      } else if (lines[index].startsWith('[x]')) {
-        lines[index] = lines[index].replaceFirst('[x]', '[ ]');
-      }
-      _contentController.text = lines.join('\n');
-    });
+  void _handleTextChange() {
+    if (_contentController.text.endsWith('\n')) {
+      _contentController.text = _contentController.text + '• ';
+      _contentController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _contentController.text.length),
+      );
+    }
+  }
+
+  void _insertBullet() {
+    int start = _contentController.selection.start;
+    int end = _contentController.selection.end;
+    String selectedText = _contentController.text.substring(start, end);
+    String newText = '• $selectedText';
+    _contentController.text = _contentController.text.replaceRange(start, end, newText);
+    _contentController.selection = TextSelection.collapsed(offset: start + 2);
+  }
+
+  void _confirmDelete() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Delete Note'),
+        content: Text('Are you sure you want to delete this note?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(true);
+              Navigator.pop(context, {'delete': true});
+            },
+            child: Text('Delete'),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -90,9 +120,7 @@ class _BlankNotePageState extends State<BlankNotePage> {
           ),
           IconButton(
             icon: Icon(Icons.delete, color: Color(0xFF757121)),
-            onPressed: () {
-              Navigator.pop(context, {'delete': true});
-            },
+            onPressed: _confirmDelete,
           ),
         ],
       ),
@@ -113,40 +141,24 @@ class _BlankNotePageState extends State<BlankNotePage> {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: _contentController.text.split('\n').length,
-                itemBuilder: (context, index) {
-                  String line = _contentController.text.split('\n')[index];
-                  return ListTile(
-                    leading: line.startsWith('[ ]') || line.startsWith('[x]')
-                        ? Checkbox(
-                            value: line.startsWith('[x]'),
-                            onChanged: (checked) {
-                              _toggleCheckbox(index);
-                            },
-                          )
-                        : null,
-                    title: TextField(
-                      controller: TextEditingController(text: line),
-                      onChanged: (newLine) {
-                        List<String> lines = _contentController.text.split('\n');
-                        lines[index] = newLine;
-                        _contentController.text = lines.join('\n');
-                      },
-                      decoration: InputDecoration(
-                        border: InputBorder.none,
-                      ),
-                      style: TextStyle(
-                        fontSize: _fontSize,
-                        fontWeight: _bold ? FontWeight.bold : FontWeight.normal,
-                        fontStyle: _italic ? FontStyle.italic : FontStyle.normal,
-                        decoration: _underline ? TextDecoration.underline : TextDecoration.none,
-                        color: _textColor,
-                        backgroundColor: _bgColor,
-                      ),
-                    ),
-                  );
-                },
+              child: TextField(
+                controller: _contentController,
+                decoration: InputDecoration(
+                  hintText: 'Text',
+                  border: InputBorder.none,
+                ),
+                maxLines: null,
+                expands: true,
+                keyboardType: TextInputType.multiline,
+                textAlignVertical: TextAlignVertical.top,
+                style: TextStyle(
+                  fontSize: _fontSize,
+                  fontWeight: _bold ? FontWeight.bold : FontWeight.normal,
+                  fontStyle: _italic ? FontStyle.italic : FontStyle.normal,
+                  decoration: _underline ? TextDecoration.underline : TextDecoration.none,
+                  color: _textColor,
+                  backgroundColor: _bgColor,
+                ),
               ),
             ),
           ],
@@ -161,8 +173,8 @@ class _BlankNotePageState extends State<BlankNotePage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                icon: Icon(Icons.check_box_outlined, color: Color(0xFF757121)),
-                onPressed: _insertCheckbox,
+                icon: Icon(Icons.format_list_bulleted, color: Color(0xFF757121)),
+                onPressed: _insertBullet,
               ),
               IconButton(
                 icon: Icon(Icons.format_bold, color: _bold ? Colors.black : Colors.grey),
